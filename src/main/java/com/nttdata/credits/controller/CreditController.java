@@ -77,7 +77,7 @@ public class CreditController {
         return creditService.update(credit);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{id}")
     public Mono<Credit> delete(@PathVariable String id) {
         return creditService.delete(id);
     }

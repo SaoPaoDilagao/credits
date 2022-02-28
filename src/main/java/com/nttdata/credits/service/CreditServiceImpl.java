@@ -18,10 +18,9 @@ public class CreditServiceImpl implements CreditService {
 
 
 	@Override
-	public Mono<Credit> createCredit(Credit credit) {
-		
+	public void createCredit(Credit credit) {
 		 credit.setActive(true);
-		 return creditRepository.save(credit);
+		 creditRepository.save(credit).subscribe();
 	}
 
 	@Override
