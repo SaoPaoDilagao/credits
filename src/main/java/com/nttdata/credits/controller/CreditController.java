@@ -2,11 +2,14 @@ package com.nttdata.credits.controller;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,10 +32,12 @@ public class CreditController {
 	private CreditService creditService;
 	
 	@PostMapping()
-    @ResponseStatus(CREATED)
-    public void create(@RequestBody Credit credit) {
+    //@ResponseStatus(CREATED)
+    public ResponseEntity<Mono<Credit>> create(@RequestBody Credit credit) {
 		
-	 creditService.createCredit(credit);
+		Mono<Credit> created = creditService.createCredit(credit);
+		
+		return new ResponseEntity<Mono<Credit>>(created,created != null? HttpStatus.CREATED:HttpStatus.BAD_REQUEST);
 	 
     }
 	
@@ -71,6 +76,15 @@ public class CreditController {
 		return new ResponseEntity<Mono<Credit>>(credits,credits != null? HttpStatus.OK:HttpStatus.NOT_FOUND);
 		
 	}
+	
+	@PatchMapping("/balance/{id}/amount/{amount}")
+	public Mono<Credit> payCredit(@PathVariable("id") String id, @PathVariable BigDecimal amount){
+		
+		Mono<Credit> credits = creditService.updateCreditBalance(id,amount);
+		return credits;
+		
+	}
+	
 	
 	@PutMapping()
     public Mono<Credit> update(@RequestBody Credit credit) {

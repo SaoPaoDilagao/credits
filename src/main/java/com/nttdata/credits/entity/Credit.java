@@ -28,11 +28,12 @@ public class Credit {
 	private Client client;
 	private String number;
 	private boolean active;
+	private int type;
 	@Field(targetType = FieldType.DECIMAL128)
     private BigDecimal credit_total;
 	@Field(targetType = FieldType.DECIMAL128)
-    private BigDecimal credit_remaining;
-	@Field(targetType = FieldType.DECIMAL128)
-    private BigDecimal debt_paid;
+    private BigDecimal credit_balance;
+	//@Field(targetType = FieldType.DECIMAL128)
+    //private BigDecimal debt_paid;
 	
 }
