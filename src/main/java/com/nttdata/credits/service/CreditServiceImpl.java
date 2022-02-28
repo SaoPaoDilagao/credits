@@ -97,8 +97,6 @@ public class CreditServiceImpl implements CreditService {
 		
 		return creditRepository.findById(new ObjectId(id))
 				.map( credit -> {
-					
-					
 					if(credit.getType() == Constants.CreditType.CARD) {
 						
 						// in case of CreditType.CARD withdrawal and deposit are 
@@ -113,7 +111,6 @@ public class CreditServiceImpl implements CreditService {
 						else
 							temp.add(amount.abs()); // withdrawal
 							
-						
 						if(temp.compareTo(credit.getCredit_total()) < 0) {
 							
 							credit.setCredit_balance(new BigDecimal(0));
@@ -122,6 +119,9 @@ public class CreditServiceImpl implements CreditService {
 						} else {
 							
 							// to manage when overflow the card limit 
+							
+							
+							return credit;
 						}
 						
 					} else { 
@@ -129,11 +129,17 @@ public class CreditServiceImpl implements CreditService {
 						// in case of CreditType.PERSONAL and CreditType BUSINESS (loan) 
 						// only payments are admited so amount can be only positive
 						
-						credit.setCredit_balance(new BigDecimal(0));
+						credit.getCredit_balance().add(amount);
+						
+						if(credit.getCredit_balance().compareTo(credit.getCredit_total()) == 0)
+						{
+							// all credit has been paid 
+							// set the active = false
+							credit.setActive(false);
+						}
 						
 					}
 					
-				
 					creditRepository.save(credit).subscribe();
 					return credit;
 				});
