@@ -77,12 +77,11 @@ public class CreditController {
 		
 	}
 	
-	@PatchMapping("/balance/{id}/amount/{amount}")
+	@PutMapping("/balance/{id}/amount/{amount}")
 	public Mono<Credit> payCredit(@PathVariable("id") String id, @PathVariable BigDecimal amount){
 		
 		Mono<Credit> credits = creditService.updateCreditBalance(id,amount);
 		return credits;
-		
 	}
 	
 	
