@@ -1,5 +1,7 @@
 package com.nttdata.credits.service;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 import java.math.BigDecimal;
 
 import org.bson.types.ObjectId;
@@ -7,9 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.nttdata.credits.Constants;
 import com.nttdata.credits.entity.Credit;
+import com.nttdata.credits.exceptions.CustomInformationException;
+import com.nttdata.credits.exceptions.CustomNotFoundException;
 import com.nttdata.credits.repository.CreditRepository;
 
 import reactor.core.publisher.Flux;
@@ -26,54 +31,58 @@ public class CreditServiceImpl implements CreditService {
 
 
 	@Override
-	// public void createCredit(Credit credit) {
 	public Mono<Credit> createCredit(Credit credit) {
-		 credit.setActive(true);
-		 
-		 //  ClientType.PERSONAL allows only a credit  
-		 if(credit.getClient().getType() == Constants.ClientType.PERSONAL) {
-		 
-			 Flux<Credit> credits = creditRepository.findByClientDocumentNumber(credit.getClient().getDocumentNumber())
-						.switchIfEmpty(creditRepository.save(credit))
-								.map(x-> {
-									logger_file.debug("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
+		
+		return creditRepository.findByNumber(credit.getNumber())
+                .doOnNext(a -> {
+                    throw new CustomInformationException("Credit number has already been created");
+                })
+                .switchIfEmpty(creditRepository.countByClientDocumentNumber(credit.getClient().getDocumentNumber())
+                        .map(a -> {
+                            if (credit.getClient().getType() == Constants.ClientType.PERSONAL && a > 0) {
+                                throw new CustomInformationException("The client type allows to have only 1 credits");
+                            } else {
+                                return a;
+                            }
+                        })
+                        .then(Mono.just(credit))
+                        .flatMap(a -> creditRepository.save(a)
+                                .map(b -> {
+                                	logger_file.debug("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
 									logger_consola.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
-									return x;}
-								);
-			 return credits.next();
-		 
-		 } else { //  ClientType.BUSINESS allows more than a credit  
-		 
-			 return creditRepository.save(credit);
-		 }
-		 
-		 // TODO how to return a Mono.empty() when a ClientType.PERSONAL has had a credit yet.
+                                    return b;
+                                })));
 	}
 
 	@Override
 	public Mono<Credit> findCreditById(String id) {
-		return creditRepository.findById(new ObjectId(id));
+		return creditRepository.findById(new ObjectId(id))
+				 .switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
 	}
 
 	@Override
 	public Flux<Credit> findCreditByClientFirstNameAndLastName(String firstName, String lastName) {
-		return creditRepository.findByClientFirstNameAndLastName(firstName, lastName);
+		return creditRepository.findByClientFirstNameAndLastName(firstName, lastName)
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.FLUX_NOT_FOUND_MESSAGE)));
 	}
 
 	@Override
 	public Flux<Credit> findCreditByClientDocumentNumber(String documentNumber) {
-		return creditRepository.findByClientDocumentNumber(documentNumber);
+		return creditRepository.findByClientDocumentNumber(documentNumber)
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.FLUX_NOT_FOUND_MESSAGE)));
 	}
 
 	@Override
 	public Mono<Credit> findCreditByNumber(String number) {
-		return creditRepository.findByNumber(number);
+		return creditRepository.findByNumber(number)
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
 	}
 
 	@Override
 	public Mono<Credit> update(Credit credit) {
 		
 		return creditRepository.findById(credit.getId())
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)))
                 .map(data -> {
                     
                 	creditRepository.save(credit).subscribe();
@@ -89,6 +98,7 @@ public class CreditServiceImpl implements CreditService {
 	@Override
 	public Mono<Credit> delete(String id) {
 		return creditRepository.findById(new ObjectId(id))
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)))
                 .map(credit -> {
                 	credit.setActive(false);
                 	creditRepository.save(credit).subscribe();
@@ -105,9 +115,8 @@ public class CreditServiceImpl implements CreditService {
 	public Mono<Credit> updateCreditBalance(String id, BigDecimal amount) {
 		
 		return creditRepository.findById(new ObjectId(id))
+				.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)))
 				.map( credit -> {
-					
-					int type = credit.getType();
 					
 					if(credit.getType() == Constants.CreditType.CARD) {
 						

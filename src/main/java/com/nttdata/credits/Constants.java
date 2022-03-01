@@ -1,6 +1,5 @@
 package com.nttdata.credits;
 
-import java.math.BigDecimal;
 
 public class Constants {
 	public static final class ClientType
@@ -16,12 +15,11 @@ public class Constants {
         public static int CARD = 3;
     }
     
-    public static final class CreditLimit
+    
+    public static final class CreditErrorMsg
     {
-    	public static int CREDIT_PERSONAL_INSTALLMENTS = 12;
-    	public static int CREDIT_BUSINESS_INSTALLMENTS = 24;
-    	public static int CREDIT_CARD_INSTALLMENTS = 12;
-    	public static BigDecimal CREDIT_CARD_MAX_LIMIT = new BigDecimal(2500);
+    	public static  String FLUX_NOT_FOUND_MESSAGE = "Data not found";
+    	public static  String MONO_NOT_FOUND_MESSAGE = "Credit not found";
     }
     
     

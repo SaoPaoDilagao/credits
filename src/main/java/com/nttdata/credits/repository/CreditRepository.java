@@ -11,5 +11,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface CreditRepository extends ReactiveMongoRepository<Credit, ObjectId>, CustomCreditRepository {
     Mono<Credit> findByNumber(String number);
+    Mono<Long> countByClientDocumentNumber(String documentNumber);
     
 }
