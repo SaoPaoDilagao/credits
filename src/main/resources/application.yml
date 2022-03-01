@@ -1,0 +1,22 @@
+server:
+  port: '8099'
+
+spring:
+  application:
+    name: credits
+  config:
+    import: optional:configserver:http://localhost:9000
+  cloud:
+    config:
+      profile: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    shutdown:
+      enabled: 'true'
+    restart:
+      enabled: 'true'
