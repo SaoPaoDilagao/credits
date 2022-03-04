@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.nttdata.credits.entity.Credit;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 public class CustomCreditRepositoryImpl implements CustomCreditRepository {
@@ -29,5 +30,13 @@ public class CustomCreditRepositoryImpl implements CustomCreditRepository {
         Query query = new Query(where("client.documentNumber").is(documentNumber));
         return mongoTemplate.find(query, Credit.class);
     }
+
+	@Override
+	public Mono<Long> countByClientDocumentNumberAndCreditType(String documentNumber, Integer creditType) {
+		Query query = new Query(where("client.documentNumber").is(documentNumber)
+                .and("type").is(creditType));
+        return mongoTemplate.count(query, Credit.class);
+		
+	}
 
 }

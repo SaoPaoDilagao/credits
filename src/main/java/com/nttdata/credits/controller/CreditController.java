@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nttdata.credits.entity.Credit;
@@ -59,6 +58,13 @@ public class CreditController {
 	public Mono<Credit> searchCreditByNumber(@PathVariable("number") String number){
 		
 		return  creditService.findCreditByNumber(number);
+		
+	}
+	
+	@GetMapping("/clientOwnsCard/{documentNumber}")
+	public Mono<Long> checkIfClientOwnsCreditCard(@PathVariable("documentNumber") String documentNumber){
+		
+		return  creditService.checkIfClientOwnsCreditCard(documentNumber);
 		
 	}
 	

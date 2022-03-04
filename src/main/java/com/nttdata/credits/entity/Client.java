@@ -12,6 +12,7 @@ public class Client {
     private String firstName;
     private String lastName;
     private String documentNumber;
+	private int profile; 
     private int type;
     private boolean active;
 }

@@ -164,4 +164,10 @@ public class CreditServiceImpl implements CreditService {
 					return credit;
 				});
 	}
+
+	@Override
+	public Mono<Long> checkIfClientOwnsCreditCard(String documentNumber) {
+		
+		return creditRepository.countByClientDocumentNumberAndCreditType(documentNumber, Constants.CreditType.CARD);
+	}
 }
