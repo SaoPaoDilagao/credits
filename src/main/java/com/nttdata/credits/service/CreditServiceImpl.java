@@ -1,6 +1,5 @@
 package com.nttdata.credits.service;
 
-import static org.springframework.http.HttpStatus.CREATED;
 
 import java.math.BigDecimal;
 
@@ -9,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.nttdata.credits.Constants;
 import com.nttdata.credits.entity.Credit;
@@ -48,7 +46,7 @@ public class CreditServiceImpl implements CreditService {
                         .then(Mono.just(credit))
                         .flatMap(a -> creditRepository.save(a)
                                 .map(b -> {
-                                	logger_file.debug("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
+                                	logger_file.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
 									logger_consola.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
                                     return b;
                                 })));
@@ -87,7 +85,7 @@ public class CreditServiceImpl implements CreditService {
                     
                 	creditRepository.save(credit).subscribe();
                     
-                    logger_file.debug("Updated the credit with id= {}", credit.getId());
+                    logger_file.info("Updated the credit with id= {}", credit.getId());
             		logger_consola.info("Updated the client with id= {}", credit.getId());
                     
                     return data;
@@ -103,7 +101,7 @@ public class CreditServiceImpl implements CreditService {
                 	credit.setActive(false);
                 	creditRepository.save(credit).subscribe();
                 	
-                	logger_file.debug("Deleted the credit with id= {}", credit.getId());
+                	logger_file.info("Deleted the credit with id= {}", credit.getId());
             		logger_consola.info("Deleted the client with id= {}", credit.getId());
                     
             		return credit;
@@ -160,7 +158,7 @@ public class CreditServiceImpl implements CreditService {
 					
 					creditRepository.save(credit).subscribe();
 					
-					logger_file.debug("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
+					logger_file.info("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
             		logger_consola.info("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
 					
 					return credit;
