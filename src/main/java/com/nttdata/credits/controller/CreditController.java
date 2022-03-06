@@ -68,6 +68,11 @@ public class CreditController {
 		
 	}
 	
+	@GetMapping("/getBalance/{number}")
+	public Mono<BigDecimal>getCreditCardBalance(@PathVariable("number") String number){
+		return creditService.getCreditCardBalance(number);
+	}
+	
 	@PutMapping("/balance/{id}/amount/{amount}")
 	public Mono<Credit> payCredit(@PathVariable("id") String id, @PathVariable BigDecimal amount){
 		

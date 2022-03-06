@@ -2,6 +2,8 @@ package com.nttdata.credits.repository;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,5 +40,13 @@ public class CustomCreditRepositoryImpl implements CustomCreditRepository {
         return mongoTemplate.count(query, Credit.class);
 		
 	}
+
+	/*@Override
+	public Mono<BigDecimal> returnBalance(String number) {
+		Query query = new Query(where("number").is(number));
+		query.fields().include("credit_balance");
+		return mongoTemplate.findOne(query, Credit.class).flatMap(credit -> Mono.just(credit.getCredit_balance()));
+		
+	}*/
 
 }

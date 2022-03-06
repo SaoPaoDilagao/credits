@@ -21,8 +21,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class CreditServiceImpl implements CreditService {
 	
-	private static final Logger logger_consola = LoggerFactory.getLogger("consola");
-	private static final Logger logger_file = LoggerFactory.getLogger("clients_log");
+	private static final Logger logger_consola = LoggerFactory.getLogger(CreditServiceImpl.class);
+	//private static final Logger logger_file = LoggerFactory.getLogger("clients_log");
 	
 	@Autowired 
 	private CreditRepository creditRepository;
@@ -46,7 +46,7 @@ public class CreditServiceImpl implements CreditService {
                         .then(Mono.just(credit))
                         .flatMap(a -> creditRepository.save(a)
                                 .map(b -> {
-                                	logger_file.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
+                                	//logger_file.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
 									logger_consola.info("Created a new credit with id= {} for the client with document number= {}", credit.getId(), credit.getClient().getDocumentNumber());
                                     return b;
                                 })));
@@ -85,7 +85,7 @@ public class CreditServiceImpl implements CreditService {
                     
                 	creditRepository.save(credit).subscribe();
                     
-                    logger_file.info("Updated the credit with id= {}", credit.getId());
+                    //logger_file.info("Updated the credit with id= {}", credit.getId());
             		logger_consola.info("Updated the client with id= {}", credit.getId());
                     
                     return data;
@@ -101,7 +101,7 @@ public class CreditServiceImpl implements CreditService {
                 	credit.setActive(false);
                 	creditRepository.save(credit).subscribe();
                 	
-                	logger_file.info("Deleted the credit with id= {}", credit.getId());
+                	//logger_file.info("Deleted the credit with id= {}", credit.getId());
             		logger_consola.info("Deleted the client with id= {}", credit.getId());
                     
             		return credit;
@@ -158,7 +158,7 @@ public class CreditServiceImpl implements CreditService {
 					
 					creditRepository.save(credit).subscribe();
 					
-					logger_file.info("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
+					//logger_file.info("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
             		logger_consola.info("The balance of the credit with id= {} was updated to {}", credit.getId(), credit.getCredit_balance());
 					
 					return credit;
@@ -169,5 +169,23 @@ public class CreditServiceImpl implements CreditService {
 	public Mono<Long> checkIfClientOwnsCreditCard(String documentNumber) {
 		
 		return creditRepository.countByClientDocumentNumberAndCreditType(documentNumber, Constants.CreditType.CARD);
+	}
+
+	@Override
+	public Mono<BigDecimal> getCreditCardBalance(String number) {
+			
+		logger_consola.info("Pippo Pluto");
+		
+		Mono<Credit> result = creditRepository.findByNumber(number)
+			.switchIfEmpty(Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
+		
+		return result.flatMap(credit -> {
+			if(credit.getType() == Constants.CreditType.CARD) {
+				return Mono.just(credit.getCredit_balance());
+			} else {
+				return Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_CREDIT_CARD));
+			}
+		});
+		
 	}
 }

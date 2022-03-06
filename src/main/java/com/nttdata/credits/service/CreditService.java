@@ -19,5 +19,6 @@ public interface CreditService {
 	Mono<Credit> update(Credit account);
 	Mono<Credit> delete(String id);
 	Mono<Long> checkIfClientOwnsCreditCard(String documentNumber);
+	Mono<BigDecimal> getCreditCardBalance(String number);
 
 }
