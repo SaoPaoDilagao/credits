@@ -62,9 +62,9 @@ public class CreditController {
 	}
 	
 	@GetMapping("/clientOwnsCard/{documentNumber}")
-	public Mono<Long> checkIfClientOwnsCreditCard(@PathVariable("documentNumber") String documentNumber){
+	public Mono<Credit> checkIfClientOwnsCreditCard(@PathVariable("documentNumber") String documentNumber){
 		
-		return  creditService.checkIfClientOwnsCreditCard(documentNumber);
+		return  creditService.findIfClientOwnsCreditCard(documentNumber);
 		
 	}
 	

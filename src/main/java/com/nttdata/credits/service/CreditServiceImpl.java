@@ -166,9 +166,10 @@ public class CreditServiceImpl implements CreditService {
 	}
 
 	@Override
-	public Mono<Long> checkIfClientOwnsCreditCard(String documentNumber) {
+	public Mono<Credit> findIfClientOwnsCreditCard(String documentNumber) {
 		
-		return creditRepository.countByClientDocumentNumberAndCreditType(documentNumber, Constants.CreditType.CARD);
+		return creditRepository.findByClientDocumentNumberAndCreditType(documentNumber, Constants.CreditType.CARD)
+				.switchIfEmpty(Mono.empty());
 	}
 
 	@Override

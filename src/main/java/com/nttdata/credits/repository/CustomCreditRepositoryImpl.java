@@ -34,10 +34,10 @@ public class CustomCreditRepositoryImpl implements CustomCreditRepository {
     }
 
 	@Override
-	public Mono<Long> countByClientDocumentNumberAndCreditType(String documentNumber, Integer creditType) {
+	public Mono<Credit> findByClientDocumentNumberAndCreditType(String documentNumber, Integer creditType) {
 		Query query = new Query(where("client.documentNumber").is(documentNumber)
                 .and("type").is(creditType));
-        return mongoTemplate.count(query, Credit.class);
+        return mongoTemplate.findOne(query, Credit.class);
 		
 	}
 

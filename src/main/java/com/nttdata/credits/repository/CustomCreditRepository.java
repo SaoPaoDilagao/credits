@@ -11,7 +11,7 @@ public interface CustomCreditRepository {
 	
     Flux<Credit> findByClientFirstNameAndLastName(String firstName, String lastName);
     Flux<Credit> findByClientDocumentNumber(String documentNumber);
-    Mono<Long> countByClientDocumentNumberAndCreditType(String documentNumber, Integer creditType);
+    Mono<Credit> findByClientDocumentNumberAndCreditType(String documentNumber, Integer creditType);
     
     //Mono <BigDecimal> returnBalance(String number);
 
