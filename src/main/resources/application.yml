@@ -2,19 +2,10 @@ server:
   port: '8099'
 
 spring:
+  profiles:
+    active: local
   application:
     name: credits
-  config:
-    import: optional:configserver:http://localhost:9000
-  cloud:
-    config:
-      profile: dev
-      
-eureka:
-  client:
-   service-url:
-      defaultZone: http://localhost:8761/eureka
-
 
 management:
   endpoints:
