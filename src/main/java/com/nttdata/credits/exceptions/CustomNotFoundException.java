@@ -1,12 +1,10 @@
 package com.nttdata.credits.exceptions;
 
+/**
+ * Object that returns a message in case an exception occurs.
+ */
 public class CustomNotFoundException extends RuntimeException {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public CustomNotFoundException(String message) {
-        super(message);
-    }
+  public CustomNotFoundException(String message) {
+    super(message);
+  }
 }
