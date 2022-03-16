@@ -17,3 +17,7 @@ management:
       enabled: 'true'
     restart:
       enabled: 'true'
+      
+backend:
+  service:
+    fees: 'http://fees/fees'

@@ -21,8 +21,14 @@ public class CreditRequest {
   private String number;
   @Valid
   private ClientRequest client;
-  @NotBlank(message = "Field type must be required")
+  @NotNull(message = "Field type must be required")
   private Integer type;
   @NotNull(message = "Field creditBalance must be required")
   private BigDecimal creditBalance;
+  @NotNull(message = "Field monthlyFeeExpirationDay must be required")
+  private int monthlyFeeExpirationDay;
+  @NotNull(message = "Field percentageInterestRate must be required")
+  private BigDecimal percentageInterestRate;
+  // It only applies to credits such as loans, not credit cards.
+  private Integer numberOfFees;
 }

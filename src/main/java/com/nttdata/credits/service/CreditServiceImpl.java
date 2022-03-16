@@ -1,16 +1,22 @@
 package com.nttdata.credits.service;
 
-import com.nttdata.credits.entity.Credit;
-import com.nttdata.credits.exceptions.CustomInformationException;
-import com.nttdata.credits.exceptions.CustomNotFoundException;
-import com.nttdata.credits.repository.CreditRepository;
-import com.nttdata.credits.utilities.Constants;
 import java.math.BigDecimal;
+
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.nttdata.credits.dto.request.CreditRequest;
+import com.nttdata.credits.dto.request.FeeRequest;
+import com.nttdata.credits.entity.Credit;
+import com.nttdata.credits.exceptions.CustomInformationException;
+import com.nttdata.credits.exceptions.CustomNotFoundException;
+import com.nttdata.credits.repository.CreditRepository;
+import com.nttdata.credits.utilities.Constants;
+
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,14 +24,18 @@ import reactor.core.publisher.Mono;
  * Credit service implementation.
  */
 @Service
+@RequiredArgsConstructor
 public class CreditServiceImpl implements CreditService {
   private static final Logger logger_consola = LoggerFactory.getLogger(CreditServiceImpl.class);
 
+  private final FeeService feeService;
+  
   @Autowired
   private CreditRepository creditRepository;
-
+  
   @Override
   public Mono<Credit> createCredit(Credit credit) {
+	  
     return creditRepository.findByNumber(credit.getNumber())
         .doOnNext(a -> {
           throw new CustomInformationException("Credit number has already been created");
@@ -43,10 +53,26 @@ public class CreditServiceImpl implements CreditService {
             .then(Mono.just(credit))
             .flatMap(a -> creditRepository.save(a)
                 .map(b -> {
+                	
+                  // if the credit is a loan (no credit card) is necessary 
+                  // to create the quotas to be paid
+                  if(credit.getType() != Constants.CreditType.CARD) {
+                	  FeeRequest request = new FeeRequest();
+                	  request.setIdTransaction(b.getId().toString());
+                	  request.setClientDocumentNumber(b.getClient().getDocumentNumber());
+                	  request.setProductNumber(b.getNumber());
+                	  request.setAmount(b.getCreditTotal());
+                	  request.setMonthlyFeeExpirationDay(b.getMonthlyFeeExpirationDay());
+                	  request.setPercentageInterestRate(b.getPercentageInterestRate());
+                	  request.setNumberOfFees(b.getNumberOfFees());
+                	  
+                	  feeService.createFees(request);
+                  }
+                  
                   logger_consola
                       .info("Created a new credit with id= {} for the client "
                               + "with document number= {}",
-                          credit.getId(), credit.getClient().getDocumentNumber());
+                              credit.getId(), credit.getClient().getDocumentNumber());
                   return b;
                 })));
   }
@@ -174,4 +200,17 @@ public class CreditServiceImpl implements CreditService {
       }
     });
   }
+	
+	@Override
+	public Mono<Integer> getMonthlyFeeExpirationDate(String number) {
+		Mono<Credit> result = creditRepository.findByNumber(number)
+		        .switchIfEmpty(Mono
+		            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
+
+	    return result.flatMap(credit -> {
+	     
+	        return Mono.just(credit.getMonthlyFeeExpirationDay());
+	      
+	    });
+	}
 }

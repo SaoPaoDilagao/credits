@@ -1,17 +1,21 @@
 package com.nttdata.credits.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nttdata.credits.dto.request.CreditRequest;
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nttdata.credits.dto.request.CreditRequest;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Credit object.
@@ -33,6 +37,10 @@ public class Credit {
   private BigDecimal creditTotal;
   @Field(targetType = FieldType.DECIMAL128)
   private BigDecimal creditBalance;
+  private int monthlyFeeExpirationDay;
+  @Field(targetType = FieldType.DECIMAL128)
+  private BigDecimal percentageInterestRate;
+  private int numberOfFees;
   private boolean active;
 
   /**
@@ -47,6 +55,9 @@ public class Credit {
     type = request.getType();
     creditTotal = BigDecimal.ZERO;
     creditBalance = request.getCreditBalance();
+    monthlyFeeExpirationDay = request.getMonthlyFeeExpirationDay();
+    percentageInterestRate = request.getPercentageInterestRate();
+    numberOfFees = request.getNumberOfFees();
     active = true;
   }
 }
