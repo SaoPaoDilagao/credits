@@ -2,6 +2,7 @@ package com.nttdata.credits.service;
 
 import java.math.BigDecimal;
 
+import com.nttdata.credits.dto.response.CreditCardFeesData;
 import com.nttdata.credits.entity.Credit;
 
 import reactor.core.publisher.Flux;
@@ -32,6 +33,8 @@ public interface CreditService {
   Mono<BigDecimal> getCreditCardBalance(String number);
   
   Mono<Integer> getMonthlyFeeExpirationDate(String number);
+  
+  Mono<CreditCardFeesData> getCreditCardFeesData(String number);
   
   
 }

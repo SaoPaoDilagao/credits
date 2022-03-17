@@ -1,10 +1,9 @@
 package com.nttdata.credits.controller;
 
-import com.nttdata.credits.dto.request.CreditRequest;
-import com.nttdata.credits.entity.Credit;
-import com.nttdata.credits.service.CreditService;
 import java.math.BigDecimal;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +13,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.nttdata.credits.dto.request.CreditRequest;
+import com.nttdata.credits.dto.response.CreditCardFeesData;
+import com.nttdata.credits.entity.Credit;
+import com.nttdata.credits.service.CreditService;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -85,4 +90,11 @@ public class CreditController {
   public Mono<Boolean> checkIfClientHasDebs(@PathVariable String documentNumber) {
     return Mono.just(false);
   }
+  
+  
+  @GetMapping("/getCreditCardFeesData/{number}")
+  public Mono<CreditCardFeesData> getCreditCardFeesData(@PathVariable String number){
+	  return creditService.getCreditCardFeesData(number);
+  }
 }
+

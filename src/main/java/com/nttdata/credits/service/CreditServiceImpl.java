@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nttdata.credits.dto.request.CreditRequest;
 import com.nttdata.credits.dto.request.FeeRequest;
+import com.nttdata.credits.dto.response.CreditCardFeesData;
 import com.nttdata.credits.entity.Credit;
 import com.nttdata.credits.exceptions.CustomInformationException;
 import com.nttdata.credits.exceptions.CustomNotFoundException;
@@ -212,5 +212,26 @@ public class CreditServiceImpl implements CreditService {
 	        return Mono.just(credit.getMonthlyFeeExpirationDay());
 	      
 	    });
+	}
+
+	@Override
+	public Mono<CreditCardFeesData> getCreditCardFeesData(String number) {
+		Mono<Credit> result = creditRepository.findByNumber(number)
+				.switchIfEmpty(Mono
+			            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
+		
+		return result.flatMap( item ->{
+			if(item.getType() != Constants.CreditType.CARD) {
+				return Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE));
+			} else {
+				CreditCardFeesData data = new CreditCardFeesData();
+				
+				data.setMonthlyFeeExpirationDay(item.getMonthlyFeeExpirationDay());
+				data.setPercentageInterestRate(item.getPercentageInterestRate());
+				data.setNumberOfFees(item.getNumberOfFees());
+				
+				return Mono.just(data);
+			}
+		});
 	}
 }
