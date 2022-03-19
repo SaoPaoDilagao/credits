@@ -30,8 +30,7 @@ public class CreditServiceImpl implements CreditService {
 
   private final FeeService feeService;
   
-  @Autowired
-  private CreditRepository creditRepository;
+  private final CreditRepository creditRepository;
   
   @Override
   public Mono<Credit> createCredit(Credit credit) {

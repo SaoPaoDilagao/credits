@@ -37,4 +37,14 @@ public class Constants {
     public static final String MONO_NOT_CREDIT_CARD =
         "The number does not correspond to a Credit Card";
   }
+  
+  /**
+   * Client profiles.
+   */
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class ClientProfile {
+    public static final int REGULAR = 1;
+    public static final int VIP = 2;
+    public static final int PYME = 3;
+  }
 }

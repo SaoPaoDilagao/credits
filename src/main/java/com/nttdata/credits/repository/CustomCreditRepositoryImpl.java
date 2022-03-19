@@ -3,6 +3,9 @@ package com.nttdata.credits.repository;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 import com.nttdata.credits.entity.Credit;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,9 +15,10 @@ import reactor.core.publisher.Mono;
 /**
  * Custom credit repository implementation.
  */
+@RequiredArgsConstructor
 public class CustomCreditRepositoryImpl implements CustomCreditRepository {
-  @Autowired
-  private ReactiveMongoTemplate mongoTemplate;
+  
+  private final ReactiveMongoTemplate mongoTemplate;
 
   @Override
   public Flux<Credit> findByClientFirstNameAndLastName(String firstName,
