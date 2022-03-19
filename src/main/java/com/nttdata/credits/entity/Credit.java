@@ -53,8 +53,8 @@ public class Credit {
     number = request.getNumber();
     client = new Client(request.getClient());
     type = request.getType();
-    creditTotal = BigDecimal.ZERO;
-    creditBalance = request.getCreditBalance();
+    creditTotal = request.getCreditTotal();
+    creditBalance = BigDecimal.ZERO;
     monthlyFeeExpirationDay = request.getMonthlyFeeExpirationDay();
     percentageInterestRate = request.getPercentageInterestRate();
     numberOfFees = request.getNumberOfFees();

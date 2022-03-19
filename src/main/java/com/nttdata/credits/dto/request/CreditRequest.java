@@ -23,8 +23,8 @@ public class CreditRequest {
   private ClientRequest client;
   @NotNull(message = "Field type must be required")
   private Integer type;
-  @NotNull(message = "Field creditBalance must be required")
-  private BigDecimal creditBalance;
+  @NotNull(message = "Field creditTotal must be required")
+  private BigDecimal creditTotal;
   @NotNull(message = "Field monthlyFeeExpirationDay must be required")
   private int monthlyFeeExpirationDay;
   @NotNull(message = "Field percentageInterestRate must be required")

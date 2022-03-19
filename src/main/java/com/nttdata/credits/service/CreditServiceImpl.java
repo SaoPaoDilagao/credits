@@ -37,14 +37,14 @@ public class CreditServiceImpl implements CreditService {
 	  
     return creditRepository.findByNumber(credit.getNumber())
         .doOnNext(a -> {
-          throw new CustomInformationException("Credit number has already been created");
+          Mono.error(new CustomInformationException("Credit number has already been created")) ;
         })
         .switchIfEmpty(creditRepository
             .countByClientDocumentNumber(credit.getClient().getDocumentNumber())
             .map(a -> {
               if (credit.getClient().getType() == Constants.ClientType.PERSONAL && a > 0) {
-                throw new CustomInformationException("The client type allows "
-                    + "to have only 1 credits");
+                return Mono.error( new CustomInformationException("The client type allows "
+                    + "to have only 1 credits"));
               } else {
                 return a;
               }
@@ -139,7 +139,7 @@ public class CreditServiceImpl implements CreditService {
         .map(credit -> {
           if (credit.getType() == Constants.CreditType.CARD) {
             // in case of CreditType.CARD withdrawal and deposit are
-            // admitted so amount can be negative and  positive respectively
+            // admitted so amount can be negative and positive respectively
             // and the balance don't exceed the total credit.
 
             BigDecimal temp = new BigDecimal(0);
