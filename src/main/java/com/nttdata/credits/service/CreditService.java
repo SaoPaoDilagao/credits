@@ -36,5 +36,7 @@ public interface CreditService {
   
   Mono<CreditCardFeesData> getCreditCardFeesData(String number);
   
+  Mono<Boolean> checkIfClientHasDebs(String documentNumber);
+  
   
 }

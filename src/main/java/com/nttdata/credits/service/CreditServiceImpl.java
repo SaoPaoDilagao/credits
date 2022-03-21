@@ -233,4 +233,20 @@ public class CreditServiceImpl implements CreditService {
 			}
 		});
 	}
+
+	@Override
+	public Mono<Boolean> checkIfClientHasDebs(String documentNumber) {
+			/*return findCreditByClientDocumentNumber(documentNumber)
+			.flatMap( item ->{
+				 item.getNumber()
+				
+				
+				
+				
+				
+			})*/
+			
+			return Mono.just(false);
+		
+	}
 }
