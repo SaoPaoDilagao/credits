@@ -603,6 +603,10 @@ public class CreditServiceTests {
 		
 	}
 	
+	/*@Test
+	public void testcCheckIfClientHasDebs() {
+		
+	}*/
 	
 
 }

@@ -1,6 +1,8 @@
 package com.nttdata.credits;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.math.BigDecimal;
@@ -495,6 +497,28 @@ class CreditsApplicationTests {
 				.verifyComplete();
 	}
 
+	@Test
+	public void testCheckIfExistFeesExpired() {
+		
+		String documentNumber = "0123456";
+		
+		Boolean test = true;
+		
+		given(creditService.checkIfClientHasDebs(any())).willReturn(Mono.just(test));
+		
+		var responseBody = webTestClient.get().uri("/credits/check/debts/{documentNumber}",documentNumber)
+				.exchange()
+				.expectStatus().isOk() 
+				.returnResult(Boolean.class)
+				.getResponseBody();
+		
+		StepVerifier.create(responseBody)
+				.expectSubscription()
+				.expectNext(test)
+				.verifyComplete();
+		
+	}
+	
 	
 
 }
