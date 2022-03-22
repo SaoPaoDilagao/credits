@@ -88,7 +88,7 @@ public class CreditController {
 
   @GetMapping("/check/debts/{documentNumber}")
   public Mono<Boolean> checkIfClientHasDebs(@PathVariable String documentNumber) {
-    return Mono.just(false);
+    return creditService.checkIfClientHasDebs(documentNumber);
   }
   
   

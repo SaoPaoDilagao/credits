@@ -43,4 +43,14 @@ public class FeeServiceImpl implements FeeService{
 		return null;
 	}
 
+	@Override
+	public Mono<Boolean> checkFeesExpired(String productNumber) {
+		 return webClient
+	        .build()
+	        .get()
+	        .uri(urlFees + "/checkIfExistFeesExpired/{productNumber}", productNumber)
+	        .retrieve()
+	        .bodyToMono(Boolean.class);
+	}
+
 }

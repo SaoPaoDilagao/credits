@@ -236,17 +236,10 @@ public class CreditServiceImpl implements CreditService {
 
 	@Override
 	public Mono<Boolean> checkIfClientHasDebs(String documentNumber) {
-			/*return findCreditByClientDocumentNumber(documentNumber)
-			.flatMap( item ->{
-				 item.getNumber()
-				
-				
-				
-				
-				
-			})*/
-			
-			return Mono.just(false);
 		
+		return findCreditByClientDocumentNumber(documentNumber)
+		.flatMap(item -> feeService.checkFeesExpired(item.getNumber()))
+		.reduce(false,Boolean::logicalOr);
+
 	}
 }
