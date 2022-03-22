@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:configserver:https://config-server-project01.azurewebsites.net
+    import: optional:configserver:https://bootcamp-configserver.azurewebsites.net
   cloud:
     config:
       profile: prod
@@ -8,4 +8,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: https://eureka-server-project01.azurewebsites.net/eureka
+      defaultZone: https://bootcamp-eurekaserver.azurewebsites.net/eureka
