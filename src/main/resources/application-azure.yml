@@ -1,0 +1,11 @@
+spring:
+  config:
+    import: optional:configserver:https://config-server-project01.azurewebsites.net
+  cloud:
+    config:
+      profile: prod
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://eureka-server-project01.azurewebsites.net/eureka
