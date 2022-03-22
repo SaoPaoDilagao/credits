@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nttdata.credits.dto.request.FeeRequest;
@@ -29,21 +28,19 @@ public class CreditServiceImpl implements CreditService {
   private static final Logger logger_consola = LoggerFactory.getLogger(CreditServiceImpl.class);
 
   private final FeeService feeService;
-  
+
   private final CreditRepository creditRepository;
-  
+
   @Override
   public Mono<Credit> createCredit(Credit credit) {
-	  
+
     return creditRepository.findByNumber(credit.getNumber())
-        .doOnNext(a -> {
-          Mono.error(new CustomInformationException("Credit number has already been created")) ;
-        })
+        .doOnNext(a -> Mono.error(new CustomInformationException("Credit number has already been created")))
         .switchIfEmpty(creditRepository
             .countByClientDocumentNumber(credit.getClient().getDocumentNumber())
             .map(a -> {
               if (credit.getClient().getType() == Constants.ClientType.PERSONAL && a > 0) {
-                return Mono.error( new CustomInformationException("The client type allows "
+                return Mono.error(new CustomInformationException("The client type allows "
                     + "to have only 1 credits"));
               } else {
                 return a;
@@ -52,26 +49,26 @@ public class CreditServiceImpl implements CreditService {
             .then(Mono.just(credit))
             .flatMap(a -> creditRepository.save(a)
                 .map(b -> {
-                	
+
                   // if the credit is a loan (no credit card) is necessary 
                   // to create the quotas to be paid
-                  if(credit.getType() != Constants.CreditType.CARD) {
-                	  FeeRequest request = new FeeRequest();
-                	  request.setIdTransaction(b.getId().toString());
-                	  request.setClientDocumentNumber(b.getClient().getDocumentNumber());
-                	  request.setProductNumber(b.getNumber());
-                	  request.setAmount(b.getCreditTotal());
-                	  request.setMonthlyFeeExpirationDay(b.getMonthlyFeeExpirationDay());
-                	  request.setPercentageInterestRate(b.getPercentageInterestRate());
-                	  request.setNumberOfFees(b.getNumberOfFees());
-                	  
-                	  feeService.createFees(request);
+                  if (credit.getType() != Constants.CreditType.CARD) {
+                    FeeRequest request = new FeeRequest();
+                    request.setIdTransaction(b.getId().toString());
+                    request.setClientDocumentNumber(b.getClient().getDocumentNumber());
+                    request.setProductNumber(b.getNumber());
+                    request.setAmount(b.getCreditTotal());
+                    request.setMonthlyFeeExpirationDay(b.getMonthlyFeeExpirationDay());
+                    request.setPercentageInterestRate(b.getPercentageInterestRate());
+                    request.setNumberOfFees(b.getNumberOfFees());
+
+                    feeService.createFees(request);
                   }
-                  
+
                   logger_consola
                       .info("Created a new credit with id= {} for the client "
                               + "with document number= {}",
-                              credit.getId(), credit.getClient().getDocumentNumber());
+                          credit.getId(), credit.getClient().getDocumentNumber());
                   return b;
                 })));
   }
@@ -199,47 +196,44 @@ public class CreditServiceImpl implements CreditService {
       }
     });
   }
-	
-	@Override
-	public Mono<Integer> getMonthlyFeeExpirationDate(String number) {
-		Mono<Credit> result = creditRepository.findByNumber(number)
-		        .switchIfEmpty(Mono
-		            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
 
-	    return result.flatMap(credit -> {
-	     
-	        return Mono.just(credit.getMonthlyFeeExpirationDay());
-	      
-	    });
-	}
+  @Override
+  public Mono<Integer> getMonthlyFeeExpirationDate(String number) {
+    Mono<Credit> result = creditRepository.findByNumber(number)
+        .switchIfEmpty(Mono
+            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
 
-	@Override
-	public Mono<CreditCardFeesData> getCreditCardFeesData(String number) {
-		Mono<Credit> result = creditRepository.findByNumber(number)
-				.switchIfEmpty(Mono
-			            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
-		
-		return result.flatMap( item ->{
-			if(item.getType() != Constants.CreditType.CARD) {
-				return Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE));
-			} else {
-				CreditCardFeesData data = new CreditCardFeesData();
-				
-				data.setMonthlyFeeExpirationDay(item.getMonthlyFeeExpirationDay());
-				data.setPercentageInterestRate(item.getPercentageInterestRate());
-				data.setNumberOfFees(item.getNumberOfFees());
-				
-				return Mono.just(data);
-			}
-		});
-	}
+    return result.flatMap(credit -> Mono.just(credit.getMonthlyFeeExpirationDay()));
+  }
 
-	@Override
-	public Mono<Boolean> checkIfClientHasDebs(String documentNumber) {
-		
-		return findCreditByClientDocumentNumber(documentNumber)
-		.flatMap(item -> feeService.checkFeesExpired(item.getNumber()))
-		.reduce(false,Boolean::logicalOr);
+  @Override
+  public Mono<CreditCardFeesData> getCreditCardFeesData(String number) {
+    Mono<Credit> result = creditRepository.findByNumber(number)
+        .switchIfEmpty(Mono
+            .error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE)));
 
-	}
+    return result.flatMap(item -> {
+      if (item.getType() != Constants.CreditType.CARD) {
+        return Mono.error(new CustomNotFoundException(Constants.CreditErrorMsg.MONO_NOT_FOUND_MESSAGE));
+      } else {
+        CreditCardFeesData data = new CreditCardFeesData();
+
+        data.setMonthlyFeeExpirationDay(item.getMonthlyFeeExpirationDay());
+        data.setPercentageInterestRate(item.getPercentageInterestRate());
+        data.setNumberOfFees(item.getNumberOfFees());
+
+        return Mono.just(data);
+      }
+    });
+  }
+
+  @Override
+  public Mono<Boolean> checkIfClientHasDebs(String documentNumber) {
+
+    return creditRepository.findByClientDocumentNumber(documentNumber)
+        .switchIfEmpty(x -> Mono.just(false))
+        .flatMap(item -> feeService.checkFeesExpired(item.getNumber()))
+        .reduce(false, Boolean::logicalOr);
+
+  }
 }
