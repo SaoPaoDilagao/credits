@@ -3,6 +3,8 @@ package com.nttdata.credits.entity;
 import java.math.BigDecimal;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,6 +30,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Credit {
   @Id
+  @JsonSerialize(using = ToStringSerializer.class)
   private ObjectId id;
   private String creditCard;
   private String number;
