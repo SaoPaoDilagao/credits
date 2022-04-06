@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credit-service-app
+  labels:
+    app: credit-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credit-service-app
+  template:
+    metadata:
+      labels:
+        app: credit-service-app
+    spec:
+      containers:
+        - name: credit-service-app
+          image: ${REPOSITORY_NAME}.azurecr.io/${APP_NAME}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8099
+          env:
+            - name: PROFILE
+              value: prod
+            - name: EUREKA_DEFAULT_ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_default_zone
+            - name: CONFIG_SERVER_SVC
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: config_server_svc
