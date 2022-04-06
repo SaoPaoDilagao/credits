@@ -2,6 +2,8 @@ server:
   port: '8099'
 
 spring:
+  webflux:
+    base-path: /credits
   application:
     name: credits
   profiles:

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nttdata.credits.dto.request.CreditRequest;
@@ -27,7 +26,6 @@ import reactor.core.publisher.Mono;
  * RestController for credit service.
  */
 @RestController
-@RequestMapping("/credits")
 public class CreditController {
   @Autowired
   private CreditService creditService;
@@ -99,11 +97,11 @@ public class CreditController {
   public Mono<Boolean> checkIfClientHasDebs(@PathVariable String documentNumber) {
     return creditService.checkIfClientHasDebs(documentNumber);
   }
-  
-  
+
+
   @GetMapping("/getCreditCardFeesData/{number}")
-  public Mono<CreditCardFeesData> getCreditCardFeesData(@PathVariable String number){
-	  return creditService.getCreditCardFeesData(number);
+  public Mono<CreditCardFeesData> getCreditCardFeesData(@PathVariable String number) {
+    return creditService.getCreditCardFeesData(number);
   }
 }
 
